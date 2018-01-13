@@ -1,4 +1,4 @@
--# SK-Project
+SK-PROJECT
 
 Multi Machine Matrix Multiplication
 
