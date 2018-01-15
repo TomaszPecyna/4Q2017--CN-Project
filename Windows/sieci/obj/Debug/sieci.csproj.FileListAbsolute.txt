@@ -10,3 +10,12 @@ C:\Users\Tomek\Desktop\c# test\sieci\sieci\obj\Debug\sieci.pdb
 C:\Users\Adrian\Desktop\STUDIA\sk\projekt\client\sieci\bin\Debug\sieci.exe.config
 C:\Users\Adrian\Desktop\STUDIA\sk\projekt\client\sieci\obj\Debug\sieci.exe
 C:\Users\Adrian\Desktop\STUDIA\sk\projekt\client\sieci\obj\Debug\sieci.pdb
+C:\Users\Tomek\Desktop\SIECI_PROJEKT\SK-Project\Windows\sieci\obj\Debug\sieci.csprojResolveAssemblyReference.cache
+C:\Users\Tomek\Desktop\SIECI_PROJEKT\SK-Project\Windows\sieci\obj\Debug\sieci.Form1.resources
+C:\Users\Tomek\Desktop\SIECI_PROJEKT\SK-Project\Windows\sieci\obj\Debug\sieci.csproj.GenerateResource.Cache
+C:\Users\Tomek\Desktop\SIECI_PROJEKT\SK-Project\Windows\sieci\bin\Debug\sieci.exe.config
+C:\Users\Tomek\Desktop\SIECI_PROJEKT\SK-Project\Windows\sieci\bin\Debug\sieci.exe
+C:\Users\Tomek\Desktop\SIECI_PROJEKT\SK-Project\Windows\sieci\bin\Debug\sieci.pdb
+C:\Users\Tomek\Desktop\SIECI_PROJEKT\SK-Project\Windows\sieci\obj\Debug\sieci.Properties.Resources.resources
+C:\Users\Tomek\Desktop\SIECI_PROJEKT\SK-Project\Windows\sieci\obj\Debug\sieci.exe
+C:\Users\Tomek\Desktop\SIECI_PROJEKT\SK-Project\Windows\sieci\obj\Debug\sieci.pdb

@@ -40,7 +40,7 @@ class Machine
 	struct sockaddr_in maddr;
 	int on;
 	int mfd;
-	
+
 public:
 	static int maxFd;
 	Machine(int machineNumber, int port, string ip)
@@ -139,6 +139,7 @@ int Machine::maxFd = 0;
 
 int main()
 {
+	/* setting connection options */
 	socklen_t x;
 	struct sockaddr_in addr,addr2;
 	int fd = socket(PF_INET, SOCK_STREAM, 0);
@@ -153,6 +154,7 @@ int main()
 
 	listen(fd,5);
 
+	/* wait for a new client and create a new thread if found */
 	while(1)
 	{
 		int fd2 = accept(fd, (struct sockaddr*)&addr2, &x);
@@ -168,9 +170,9 @@ int main()
 
 void threadClientHandle(int cfd)
 {
+	/* needed variables declaration */
 	vector<Machine>* machines = readData();
 	int numberOfMachines = machines->size();
-	//numberOfMachines = 1;
 	int initializedMachines = 0;
 	static struct timeval tTimeout;
 	fd_set fsMask, fsRmask, fsWmask;
@@ -180,12 +182,11 @@ void threadClientHandle(int cfd)
 	string tmpMessage = readFromADescriptor(cfd, 1);
 	string myArrayString1 = tmpMessage.substr(0, tmpMessage.size()/2);
 	string myArrayString2 = tmpMessage.substr(tmpMessage.size()/2);
-	cout << "pierwssza:\n" << myArrayString1;
-	cout << "\ndruga:\n" << myArrayString2 << endl;
 
 	vector<vector<int>> myArrayVector1 = csvToVectorMatrix(myArrayString1);
 	vector<vector<int>> myArrayVector2 = csvToVectorMatrix(myArrayString2);
 
+	/* initialization of empty (for now) result matrix */
 	vector<vector<int>>* result = new vector<vector<int>>;
 	for (int i = 0; i < myArrayVector1.size(); i++)
 	{
@@ -208,6 +209,8 @@ void threadClientHandle(int cfd)
        	tTimeout.tv_usec = 0;
 
 	string fieldString;
+
+	/* connecting to machines and sending them initial data to compute */
 	
 	int i = -1;
 	int j = 0;
@@ -222,7 +225,6 @@ void threadClientHandle(int cfd)
 			machines->at(initializedMachines).setProcessedCol(j);
 			machines->at(initializedMachines).setFlag(true);
 			int fd = machines->at(initializedMachines).getFd();
-			mfd = fd; // TODO to jeszcze trzeba bedzie wywalic pozniej 
 			FD_SET(fd, &fsRmask);
 			if(write(fd, fieldString.c_str(), fieldString.size()*sizeof(char)) == -1)
 			{
@@ -237,12 +239,12 @@ void threadClientHandle(int cfd)
 
 	for (; i < myArrayVector1.size();)
 	{
-		//cout << endl << endl << endl << i << j << endl << endl << endl; 
 		for (; j < myArrayVector1.size();)
 		{
 			tTimeout.tv_sec = 5;
        			tTimeout.tv_usec = 0;
 			
+			/* simple select function waiting for ready to read descriptor, which means that machine is ready to be used again */
 			nFound = select(nMaxfd + 1, &fsRmask, &fsWmask, (fd_set*) 0, &tTimeout);
 
 	
@@ -259,6 +261,7 @@ void threadClientHandle(int cfd)
 			{
 				if (FD_ISSET(nFd, &fsRmask))
 				{
+					/* checking which machine is ready to be used */
 					for (size_t m = 0; m < numberOfMachines; m++)
 					{
 						if (machines->at(m).getFd() == nFd) 
@@ -271,14 +274,8 @@ void threadClientHandle(int cfd)
 					currentMachine->setFlag(false);
 					result->at(currentMachine->getProcessedRow()).at(currentMachine->getProcessedCol()) = stoi(tmpMyMessage);
 					
-					/*if(write(mfd, message.c_str(), message.size()*sizeof(char)) == -1)
-					{
-						perror("write error");
-						exit(1);
-					}*/
 					FD_SET(nFd, &fsRmask);
 					fieldString = stringDecorator(takeOneRowOneColForField(myArrayVector1, myArrayVector2, i, j));
-					cout << fieldString;
 					if(write(nFd, fieldString.c_str(), fieldString.size()*sizeof(char)) == -1)
 					{
 						perror("write error");
@@ -287,7 +284,6 @@ void threadClientHandle(int cfd)
 					currentMachine->setProcessedRow(i);
 					currentMachine->setProcessedCol(j);
 					currentMachine->setFlag(true);
-					// to tutaj naprawic te ify
 					j++;
 					if(i < myArrayVector1.size() && j >= myArrayVector1.size())
 					{
@@ -310,6 +306,7 @@ void threadClientHandle(int cfd)
 		}
 	}
 
+	/* telling machines that their work with this matrix is done */
 	for (size_t m = 0; m < numberOfMachines; m++)
 	{
 		if (machines->at(m).isFlag()) 
@@ -323,15 +320,6 @@ void threadClientHandle(int cfd)
 		}
 	}
 
-
-	//tutaj na theEnd tez petelke panie inzynierze!
-	/*if(write(mfd, theEnd.c_str(), theEnd.size()*sizeof(char)) == -1)
-	{	
-		perror("write error");
-		exit(1);
-	}*/
-
-
 	for (size_t m = 0; m < numberOfMachines; m++)
 	{
 		currentMachine = &machines->at(m);
@@ -342,7 +330,7 @@ void threadClientHandle(int cfd)
 		}
 	}
 
-	string myMessage = stringDecorator(matrixToCsv(*result));
+	string myMessage = matrixToCsv(*result);
 	if(write(cfd, myMessage.c_str(), myMessage.size()*sizeof(char)) == -1)
 	{
 		perror("write error");

@@ -30,7 +30,8 @@ int MACHINE;
 
 
 int main(int co, char** argv)
-{	
+{
+	/* initial socket setup */	
 	readData(argv);
 	socklen_t x;
 	struct sockaddr_in addr,addr2;
@@ -48,6 +49,7 @@ int main(int co, char** argv)
 
 	while(1)
 	{
+		/* wait for a connection */
 		int fd2 = accept(fd, (struct sockaddr*)&addr2, &x);
 		setsockopt(fd2, SOL_SOCKET, SO_REUSEADDR, (char*)&on, sizeof(on));
 	
@@ -63,7 +65,7 @@ void multiplicationHandle(int fd2)
 	string message;
 	int nbytes;
 
-	//jest ciekawie jak tutaj sie zapoda while(1) - przetestowac
+	/* start handling request */
 	while(1)
 	{
 		try
@@ -78,13 +80,13 @@ void multiplicationHandle(int fd2)
 		vector<vector<int>> toMultiply = csvToVectorMatrix(message);
 		int field = multiplyFieldInMatrix(toMultiply);
 		string toSend = stringDecorator(to_string(field));
-		
+
+		/* random sleep for complex computations simulation */
 		srand ( time(NULL) );
 		int randomTime = rand() %5;
-		//randomTime = 1;
 		sleep(randomTime);
 	
-
+		/* sending return value */
 		if(write(fd2, toSend.c_str(), toSend.size()*sizeof(char)) == -1)
 		{
 			perror("write error");
